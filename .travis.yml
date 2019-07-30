@@ -1,0 +1,40 @@
+language: c
+
+git:
+  depth: 1000
+
+before_install:
+  - apt-get install gcc-arm-none-eabi
+
+after_script:
+ # upload to an S3 bucket, requires S3_BUCKET, AWS_ACCESS_KEY_ID and AWS_SECRET_KEY to be set
+ # in environment using travis' repository settings
+  - "if [[ -n \"$S3_BUCKET\" && -n \"$AWS_ACCESS_KEY_ID\" ]]; then
+     echo Uploading *.tgz to $S3_BUCKET;
+     curl -Ls https://github.com/rlmcpherson/s3gof3r/releases/download/v0.5.0/gof3r_0.5.0_linux_amd64.tar.gz | tar zxf - gof3r_0.5.0_linux_amd64/gof3r;
+     mv gof3r*/gof3r .;
+     ls *.tgz | xargs -I {} ./gof3r put -b $S3_BUCKET -k esp-link/{} --acl public-read -p {};
+     ls *.tgz | xargs -I {} echo \"URL: http://$S3_BUCKET/esp-link/{}\";
+     fi"
+
+compiler: gcc
+
+env:
+
+script:
+  - export BRANCH=$TRAVIS_BRANCH
+    #- export SDK_BASE=$PWD/esp_iot_sdk_v2.0.0.p1
+  - git tag -n1
+  - git describe --tags --match 'v*.0' --long --debug
+  - make_all.bat
+
+notifications:
+  email: false
+
+deploy:
+  provider: releases
+  api_key: "GITHUB OAUTH TOKEN"
+  file: "FILE TO UPLOAD"
+  skip_cleanup: true
+  on:
+    tags: true
