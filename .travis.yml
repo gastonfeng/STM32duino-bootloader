@@ -24,7 +24,7 @@ env:
 script:
   - export BRANCH=$TRAVIS_BRANCH
   - git tag -n1
-  - git describe --tags --match 'v*.0' --long --debug
+  - git describe --tags --match 'v*.0' --long --debug --always
   - chmod +x ./make_all.bat
   - ./make_all.bat
 
