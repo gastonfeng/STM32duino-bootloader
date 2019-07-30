@@ -23,7 +23,6 @@ env:
 
 script:
   - export BRANCH=$TRAVIS_BRANCH
-    #- export SDK_BASE=$PWD/esp_iot_sdk_v2.0.0.p1
   - git tag -n1
   - git describe --tags --match 'v*.0' --long --debug
   - chmod +x ./make_all.bat
@@ -37,5 +36,6 @@ deploy:
   api_key: "GITHUB OAUTH TOKEN"
   file: "FILE TO UPLOAD"
   skip_cleanup: true
+  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
   on:
-    tags: true
+    branch: master
